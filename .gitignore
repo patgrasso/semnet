@@ -3,3 +3,6 @@ __pycache__
 
 # Python compiled files
 *.pyc
+
+# Config files
+*.cfg

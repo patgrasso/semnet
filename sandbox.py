@@ -2,14 +2,17 @@
 from nltk.stem.porter import PorterStemmer
 from nltk.parse.stanford import StanfordDependencyParser
 import sys, time, os
+from configparser import ConfigParser
 
 from models import Concept, Thing
 import handles
 
 
-graphs_dir = "./graphs"
-path_to_jar = "../nltk_data/stanford/stanford-corenlp-full-2016-10-31/stanford-corenlp-3.7.0.jar"
-path_to_models_jar = "../nltk_data/stanford/stanford-english-corenlp-2016-10-31-models.jar"
+config = ConfigParser()
+config.read("config.cfg")
+graphs_dir = config.get("graphs", "output-dir")
+path_to_jar = config.get("stanford", "jar-path")
+path_to_models_jar = config.get("stanford", "model-path")
 
 stemmer = PorterStemmer()
 parser = StanfordDependencyParser(

@@ -4,6 +4,7 @@ import sandbox
 import sys
 import os
 import subprocess
+import config
 from models import Concept
 
 if len(sys.argv) <= 1:
