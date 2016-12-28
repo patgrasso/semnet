@@ -1,5 +1,4 @@
 
-concepts = []
 
 class Concept(object):
 
@@ -9,9 +8,6 @@ class Concept(object):
         self.mods = mods or []
         self.children = []
         self.parent = parent
-
-        if parent is None:
-            concepts.append(self)
 
     def __repr__(self, indent=0):
         ret = ["%s <%s> %s" % (self.__class__.__name__, self.name, self.mods)]
@@ -81,28 +77,4 @@ class Concept(object):
         attrs = self.parent.attributes if self.parent is not None else {}
         attrs.update(self._attributes)
         return attrs
-
-    @staticmethod
-    def get(name, mods=None):
-        mods = mods or []
-
-        for concept in concepts:
-            if concept.name == name:
-                return concept._find_child(mods)
-
-        return Concept(name)._find_child(mods)
-
-    @staticmethod
-    def concepts():
-        return concepts
-
-    @staticmethod
-    def to_dot(filename):
-        f = open(filename, 'w')
-        f.write("digraph concept {\n")
-        for concept in concepts:
-            f.write(concept._to_dot())
-            f.write('\n')
-        f.write("\n}\n")
-        f.close()
 
