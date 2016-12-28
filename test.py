@@ -1,9 +1,12 @@
 
-import sys
+import sys, os
 
 from assimilation import Assimilator
 from network import SemNet
+import interp
 import parser
+import config
+
 
 mind = SemNet()
 handler = Assimilator(mind)
@@ -23,6 +26,7 @@ def parse(sentence):
     dep_graph = next(parser.raw_parse(sentence))
     #nodes = parser.connect_nodes(dep_graph)
     #handler.assimilate(nodes[0])
+    interp.eval_root(dep_graph.root, dep_graph.nodes, mind)
     return dep_graph
 
 def repl():
@@ -36,7 +40,9 @@ def repl():
         elif sentence.startswith("dot"):
             fname = (sentence.split(' ') + [None])[1]
             if fname is not None:
-                mind.to_dot(fname)
+                mind.to_dot(os.path.join(
+                    config.get("graphs", "output-dir"),
+                    fname))
         else:
             dep_graph = parse(sentence)
 
@@ -46,5 +52,8 @@ def repl():
             for i, node in dep_graph.nodes.items():
                 print(i, { key: val for key, val in node.items()
                            if key in ["rel", "word", "deps", "tag"] })
+
+#parse("a tree is a tall plant with a trunk and branches made of wood")
+#parse("the oldest tree ever discovered is approximately 5,000 years old")
 
 repl()

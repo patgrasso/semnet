@@ -1,35 +1,38 @@
 
-#from .concept import Concept
-from network import Concept
+from .concept import Concept
+from nltk.stem import WordNetLemmatizer
 
 class SemNet(object):
 
-    def __init__(self, stemmer=None):
-        self._concepts = []
-        self._stemmer = stemmer
+    def __init__(self):
+        self.concepts = []
+        self.lemmatizer = WordNetLemmatizer()
 
-    def get(self, name, amods=None):
-        amods = amods or []
+    def get(self, name, mods=None):
+        """
+        Retrieves a concept by name from the network with modifiers
 
-        if self._stemmer is not None:
-            name = self._stemmer.stem(name)
+        @param name: str
+        @param mods: [str | (str, str)]
 
-        for concept in self._concepts:
+        @return network.Concept
+        """
+        mods = mods or []
+
+        name = self.lemmatizer.lemmatize(name, pos='v')
+
+        for concept in self.concepts:
             if concept.name == name:
-                return concept._find_child(amods)
+                return concept._find_child(mods)
 
-        new_concept = Concept(name)
-        self._concepts.append(new_concept)
-        return new_concept._find_child(amods)
-
-    @property
-    def concepts(self):
-        return self._concepts
+        new_concept = Concept(name, self)
+        self.concepts.append(new_concept)
+        return new_concept._find_child(mods)
 
     def to_dot(self, filename):
         f = open(filename, 'w')
         f.write("digraph concept {\n")
-        for concept in self._concepts:
+        for concept in self.concepts:
             f.write(concept._to_dot())
             f.write('\n')
         f.write("\n}\n")
