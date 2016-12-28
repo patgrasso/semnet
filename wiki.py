@@ -5,7 +5,7 @@ import sys
 import os
 import subprocess
 import config
-from models import Concept
+from network import Concept
 
 if len(sys.argv) <= 1:
     sys.argv += ["tree"]

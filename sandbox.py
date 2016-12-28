@@ -4,7 +4,7 @@ from nltk.parse.stanford import StanfordDependencyParser
 import sys, time, os
 from configparser import ConfigParser
 
-from models import Concept, Thing
+from network import SemNet
 import handles
 
 

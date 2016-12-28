@@ -1,5 +1,5 @@
 
-from models import Concept
+from network import Concept
 from nltk.stem.porter import PorterStemmer
 from nltk.stem.snowball import SnowballStemmer
 
@@ -23,10 +23,11 @@ def handle_dobj(node, subj, nodes):
 
 
 def get_concept(node, nodes):
-    mods = None
+    amods = None
     if "amod" in node["deps"].keys():
-        mods = [ps.stem(nodes[mod]["word"]) for mod in node["deps"]["amod"]]
-    return Concept.get(ps.stem(node["word"]), mods)
+        amods = [ps.stem(nodes[mod]["word"]) for mod in node["deps"]["amod"]]
+
+    return Concept.get(ps.stem(node["word"]), amods)
 
 def from_root(root, nodes, prev_subj=None):
     if "nsubj" in root["deps"]:

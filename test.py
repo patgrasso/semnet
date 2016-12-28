@@ -2,11 +2,10 @@
 import sys
 
 from assimilation import Assimilator
-from concept import ConceptMap
+from network import SemNet
 import parser
 
-
-mind = ConceptMap()
+mind = SemNet()
 handler = Assimilator(mind)
 
 def show_concept(concept=None):

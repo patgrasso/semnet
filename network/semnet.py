@@ -1,8 +1,8 @@
 
 #from .concept import Concept
-from concept import Concept
+from network import Concept
 
-class ConceptNetwork(object):
+class SemNet(object):
 
     def __init__(self, stemmer=None):
         self._concepts = []
