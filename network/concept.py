@@ -10,7 +10,7 @@ class Concept(object):
         self.children = []
         self.parent = parent
 
-    def __repr__(self, indent=0):
+    def _full_str(self, indent=0):
         ret = ["<%s '%s' %s>" % (self.__class__.__name__, self.name, self.mods)]
         for attr_name, attr_values in self.attributes.items():
             ret.append("|-" + attr_name + ":")
@@ -24,6 +24,9 @@ class Concept(object):
 
         return ("\n" + "|   "*indent).join(ret)
 
+    def __repr__(self):
+        return self._dot_label()
+
     def __getitem__(self, name):
         return self.attributes[name]
 
@@ -34,6 +37,9 @@ class Concept(object):
         if value not in self._attributes[name]:
             self._attributes[name].append(value)
         return value
+
+    def __hash__(self):
+        return id(self)
 
     def decorate(self, mod, case=None):
         if type(mod) == str:
@@ -58,12 +64,23 @@ class Concept(object):
             if found is not None:
                 return found
 
-        if all_self_in_mods:
-            new_concept = Concept(self.name, self.semnet, self, mods)
-            self.children.append(new_concept)
-            return new_concept
+        if not all_self_in_mods and self.parent is not None:
+            return self.parent._find_child(mods)
 
-        return None
+        new_concept = Concept(self.name, self.semnet, self, mods)
+        self.children.append(new_concept)
+        return new_concept
+
+    def _ref_count(self, ref_counts):
+        for attr, objs in self._attributes.items():
+            for obj in objs:
+                if obj not in ref_counts:
+                    ref_counts[obj] = 0
+                ref_counts[obj] += 1
+        for child in self.children:
+            child._ref_count(ref_counts)
+        return ref_counts
+
 
     def _dot_label(self):
         mods = [ "%s %s" % (mod[1], mod[0]._dot_label())
@@ -73,24 +90,25 @@ class Concept(object):
             return self.name + '(' + ", ".join(mods) + ')'
         return self.name
 
-    def _to_dot(self, filename=None):
+    def _to_dot(self, ref_counts=None):
         node_label = self._dot_label()
 
         ret = []
-        if self.parent is not None:
-            ret.append('"{}" -> "{}" [style=dotted]'.format(
-                node_label,
-                self.parent._dot_label()))
-
-        for key, values in self._attributes.items():
-            for value in values:
-                ret.append('"{}" -> "{}" [label="{}"]'.format(
+        if ref_counts is None or self in ref_counts or len(self._attributes) > 0:
+            if self.parent is not None:
+                ret.append('"{}" -> "{}" [style=dotted]'.format(
                     node_label,
-                    value._dot_label(),
-                    key))
+                    self.parent._dot_label()))
+
+            for key, values in self._attributes.items():
+                for value in values:
+                    ret.append('"{}" -> "{}" [label="{}"]'.format(
+                        node_label,
+                        value._dot_label(),
+                        key))
 
         for child in self.children:
-            ret.append(child._to_dot())
+            ret.append(child._to_dot(ref_counts))
         return '\n'.join(ret)
 
     @property

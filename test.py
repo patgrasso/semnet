@@ -1,7 +1,6 @@
 
 import sys, os
 
-from assimilation import Assimilator
 from network import SemNet
 import interp
 import parser
@@ -9,7 +8,6 @@ import config
 
 
 mind = SemNet()
-handler = Assimilator(mind)
 
 def show_concept(concept=None):
     if concept is None:

@@ -17,8 +17,11 @@ mind = SemNet()
 for page in pages:
     wikipedia.set_lang("simple")
     page = wikipedia.page(page)
+
     content = page.content.split('.')
-    content = [sent.lower() for sent in content]
+    content = [sent.lower().strip() for sent in content]
+    content = [''.join([i if ord(i) < 128 else '' for i in sent])
+               for sent in content]
 
     result = parser.raw_parse_sents(content)
 

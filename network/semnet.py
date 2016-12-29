@@ -19,7 +19,7 @@ class SemNet(object):
         """
         mods = mods or []
 
-        name = self.lemmatizer.lemmatize(name, pos='v')
+        name = self.lemmatizer.lemmatize(name)
 
         for concept in self.concepts:
             if concept.name == name:
@@ -31,10 +31,16 @@ class SemNet(object):
 
     def to_dot(self, filename):
         f = open(filename, 'w')
-        f.write("digraph concept {\n")
+        f.write("digraph semnet {\n")
+
+        ref_counts = {}
         for concept in self.concepts:
-            f.write(concept._to_dot())
+            concept._ref_count(ref_counts)
+
+        for concept in self.concepts:
+            f.write(concept._to_dot(ref_counts))
             f.write('\n')
+
         f.write("\n}\n")
         f.close()
 
