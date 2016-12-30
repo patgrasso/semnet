@@ -46,6 +46,9 @@ only refers to tall plants, which is a subset of all plants.
 
 
 ## Example
+
+![Simple network of the below parses][tree-plant-leaf-net]
+
 ```
 parse("trees are tall plants")
 
@@ -70,4 +73,3 @@ parse("plants have green leaves")
    Concept <green>
 ```
 
-![Simple network of the above parses][tree-plant-leaf-net]
