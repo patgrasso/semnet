@@ -29,18 +29,33 @@ class SemNet(object):
         self.concepts.append(new_concept)
         return new_concept._find_child(mods)
 
-    def to_dot(self, filename):
-        f = open(filename, 'w')
-        f.write("digraph semnet {\n")
+    def to_dot(self, filename=None):
+        content = "digraph semnet {\n"
 
         ref_counts = {}
         for concept in self.concepts:
             concept._ref_count(ref_counts)
 
         for concept in self.concepts:
-            f.write(concept._to_dot(ref_counts))
-            f.write('\n')
+            content += concept._to_dot(ref_counts)
+            content += '\n'
 
-        f.write("\n}\n")
-        f.close()
+        content += "\n}\n"
+
+        if filename is not None:
+            f = open(filename, 'w')
+            f.close()
+        return content
+
+    def to_list(self):
+        relations = []
+
+        ref_counts = {}
+        for concept in self.concepts:
+            concept._ref_count(ref_counts)
+
+        for concept in self.concepts:
+            relations += concept._to_list(ref_counts)
+
+        return relations
 

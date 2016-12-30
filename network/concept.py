@@ -111,6 +111,28 @@ class Concept(object):
             ret.append(child._to_dot(ref_counts))
         return '\n'.join(ret)
 
+    def _to_list(self, ref_counts=None):
+        node_label = self._dot_label()
+
+        ret = []
+        if ref_counts is None or self in ref_counts or len(self._attributes) > 0:
+            if self.parent is not None:
+                ret.append({
+                    "source": node_label,
+                    "target": self.parent._dot_label(),
+                    "type": "<typeof>"})
+
+            for key, values in self._attributes.items():
+                for value in values:
+                    ret.append({
+                        "source": node_label,
+                        "target": value._dot_label(),
+                        "type": key})
+
+        for child in self.children:
+            ret += child._to_list(ref_counts)
+        return ret
+
     @property
     def attributes(self):
         attrs = self.parent.attributes if self.parent is not None else {}
