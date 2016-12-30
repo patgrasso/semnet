@@ -1,4 +1,5 @@
 [example-net]: images/semnet.png
+[tree-plant-leaf-net]: images/tree-plant-leaf.png
 
 # SemNet
 
@@ -49,13 +50,13 @@ only refers to tall plants, which is a subset of all plants.
 parse("trees are tall plants")
 
 => Concept <tree>
-     are:
+     be:
        Concept <plant> [tall]
        
 parse("plants have green leaves")
 
 => Concept <tree>
-     are:
+     be:
        Concept <plant> [tall]
          have:
            Concept <leav> [green]
@@ -68,3 +69,5 @@ parse("plants have green leaves")
    
    Concept <green>
 ```
+
+![Simple network of the above parses][tree-plant-leaf.png]
