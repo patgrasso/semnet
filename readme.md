@@ -70,4 +70,4 @@ parse("plants have green leaves")
    Concept <green>
 ```
 
-![Simple network of the above parses][tree-plant-leaf.png]
+![Simple network of the above parses][tree-plant-leaf-net]
