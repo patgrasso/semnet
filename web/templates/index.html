@@ -2,15 +2,50 @@
   <head>
     <title>SemNet</title>
     <style>
-    .link {
-      stroke: #000
-      stroke-width: 1
-    }
+     .link {
+         stroke: #000
+         stroke-width: 1
+     }
+     #status {
+         color: #ff6f00;
+         font-weight: 700;
+         margin: 5px 0 0 0;
+     }
+     input[type="text"] {
+         width: 100%
+     }
+     input[type="submit"] {
+         width: 100px;
+         background-color: #43a047;
+         color: white;
+         font-weight: 700;
+         border: 2px solid #1b5e20;
+         border-radius: 3px;
+         margin-top: 5px;
+     }
+     input[type="submit"]:hover {
+         background-color: #2e7d32;
+
+     }
+     form {
+         position: fixed;
+         border: 2px solid black;
+         padding: 10px;
+         z-index: 4;
+         width: 250px;
+     }
     </style>
   </head>
   <body>
-    <form id="sentence_form" action="/parse" method="POST">
-      <input type="text" name="sentence" placeholder="Type a sentence..." />
+    <form id="sentence_form" action="/wiki_page" method="POST">
+      <input
+        type="text"
+        name="sentence"
+        placeholder="Enter a topic..."
+        autocomplete="off"
+      />
+      <input type="submit" name="submit" value="Assimilate" />
+      <p id="status" hidden="hidden">Loading (this can take a while...)</p>
     </form>
     <!--svg id="semnet-graph"></svg-->
     <div id="semnet-graph-canvas"></div>

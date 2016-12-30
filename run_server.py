@@ -9,7 +9,7 @@ import wikipedia
 mind = SemNet()
 app = Flask(__name__,
             template_folder="web/templates")
-wikipedia.set_lang("simple")
+#wikipedia.set_lang("simple")
 
 @app.route("/")
 def index():
@@ -91,3 +91,5 @@ def get_graph_vis():
 @app.route("/to_dot")
 def to_dot():
     return mind.to_dot()
+
+app.run(host="0.0.0.0")

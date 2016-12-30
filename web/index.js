@@ -224,12 +224,21 @@ function postRequest(url, formdata, callback) {
 }
 
 function onSentenceFormSubmit(e) {
-  console.log(e);
+  var formdata = new FormData(e.target)
+    , statusText = document.getElementById('status');
+
   e.preventDefault();
-  postRequest(e.target.action, new FormData(e.target), (semnet) => {
-    //drawSemNet(semnet.result);
+  e.target.children.sentence.value = '';
+  e.target.children.sentence.disabled = true;
+  e.target.children.submit.disabled = true;
+  statusText.hidden = false;
+
+  postRequest(e.target.action, formdata, (semnet) => {
     getRequest('/to_dot', (dotString) => {
       drawSemNetGraphVis(dotString);
+      e.target.children.sentence.disabled = false;
+      e.target.children.submit.disabled = false;
+      statusText.hidden = true;
     }, true);
   });
 }
