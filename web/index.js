@@ -1,3 +1,4 @@
+// Please don't judge me -- it's just a prototype ;)
 
 function drawSemNet(links) {
   var nodes = {};
@@ -169,9 +170,21 @@ function drawSemNetGraphSigma() {
 }
 
 
+var previousSemnetDot = '';
+
 function drawSemNetGraphVis(semnetDot) {
+
+  if (semnetDot === previousSemnetDot) {
+    console.log(new Date().toISOString(), 'No update');
+    return;
+  }
+
   var container = document.getElementById('semnet-graph-canvas');
   var parsedData = vis.network.convertDot(semnetDot);
+  var progressBar = document.getElementById('progress-drawing');
+  var topicHeader = document.getElementById('topics');
+
+  previousSemnetDot = semnetDot;
 
   var data = {
     nodes: parsedData.nodes,
@@ -179,8 +192,43 @@ function drawSemNetGraphVis(semnetDot) {
   };
 
   var options = parsedData.options;
+  options.layout = {
+    improvedLayout: false
+  };
+  options.physics = {
+    stabilization: {
+      updateInterval: 10
+    }
+  };
 
   var network = new vis.Network(container, data, options);
+
+  document.getElementById('status-drawing').hidden = false;
+  progressBar.value = 0;
+  progressBar.hidden = false;
+
+  network.on('afterDrawing', () => {
+    document.getElementById('status-drawing').hidden = true;
+    progressBar.hidden = true;
+  });
+
+  network.on('stabilizationProgress', (progress) => {
+    progressBar.value = progress.iterations;
+    progressBar.max = progress.total;
+  });
+
+  network.on('doubleClick', (e) => {
+    var newTopic = e.nodes[0].split('(')[0];
+
+    topics.push(newTopic);
+    updateTopicList(topics);
+
+    var form = new FormData();
+    form.append('sentence', newTopic);
+
+    postRequest('/wiki_page', form, null, true);
+  });
+
 
   /*
   var nodes = new vis.DataSet(semnet.nodes)
@@ -196,46 +244,69 @@ function drawSemNetGraphVis(semnetDot) {
 }
 
 
-function getRequest(url, callback, nonJSON) {
+function updateTopicList(topics) {
+  var topicul = document.getElementById('topics');
+
+  topicul.innerHTML = '';
+
+  topics.forEach((t) => {
+    var li = document.createElement('li');
+    li.innerText = t;
+    topicul.appendChild(li);
+  });
+}
+
+
+function getRequest(url, params, callback, nonJSON) {
   var xhr = new XMLHttpRequest();
   xhr.onreadystatechange = () => {
     if (xhr.readyState == XMLHttpRequest.DONE) {
       if (nonJSON) {
-        callback(xhr.responseText);
+        callback && callback(xhr.responseText, xhr.status);
       } else {
-        callback(JSON.parse(xhr.responseText));
+        callback && callback(JSON.parse(xhr.responseText), xhr.status);
       }
     }
   };
-  xhr.open('GET', url, true);
+  xhr.open('GET', url + '?' + params, true);
   xhr.send();
 }
 
-function postRequest(url, formdata, callback) {
+function postRequest(url, formdata, callback, nonJSON) {
   var xhr = new XMLHttpRequest();
   xhr.onreadystatechange = () => {
     if (xhr.readyState == XMLHttpRequest.DONE) {
-      callback(JSON.parse(xhr.responseText));
-      //drawSemNetGraphSigma();
+      if (nonJSON) {
+        callback && callback(xhr.responseText, xhr.status);
+      } else {
+        callback && callback(JSON.parse(xhr.responseText), xhr.status);
+      }
     }
   };
   xhr.open('POST', url, true);
   xhr.send(formdata);
 }
 
+
+var topics = [];
+
+
 function onSentenceFormSubmit(e) {
   var formdata = new FormData(e.target)
-    , statusText = document.getElementById('status');
+    , statusText = document.getElementById('status')
+    , topicHeader = document.getElementById('topics');
 
   e.preventDefault();
+  topics = e.target.children.sentence.value.split(',').map((t) => t.trim());
+  updateTopicList(topics);
   e.target.children.sentence.value = '';
   e.target.children.sentence.disabled = true;
   e.target.children.submit.disabled = true;
   statusText.hidden = false;
 
   postRequest(e.target.action, formdata, (semnet) => {
-    getRequest('/to_dot', (dotString) => {
-      drawSemNetGraphVis(dotString);
+    getRequest('/to_dot', 'topics='+topics, (dotString) => {
+      //drawSemNetGraphVis(dotString);
       e.target.children.sentence.disabled = false;
       e.target.children.submit.disabled = false;
       statusText.hidden = true;
@@ -247,6 +318,12 @@ document
   .getElementById('sentence_form')
   .addEventListener('submit', onSentenceFormSubmit);
 
-getRequest('/to_dot', (semnetDot) => drawSemNetGraphVis(semnetDot), true);
+var updateDot = () => {
+  getRequest('/to_dot', 'topics='+topics, (semnetDot) => {
+    drawSemNetGraphVis(semnetDot);
+    setTimeout(updateDot, 5000);
+  }, true);
+};
 
-//drawSemNetGraphSigma();
+updateDot();
+

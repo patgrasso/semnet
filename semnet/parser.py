@@ -4,7 +4,7 @@ from nltk.parse.stanford import StanfordDependencyParser
 from collections import defaultdict
 import copy
 
-import config
+import semnet.config as config
 
 class Struct:
     def __init__(self, entries):

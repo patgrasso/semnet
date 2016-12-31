@@ -1,30 +1,35 @@
 
 import sys, os
 
-from network import SemNet
-import interp
-import parser
-import config
+from semnet.network import SemNet
+import semnet.interp as interp
+import semnet.parser as parser
+import semnet.config
+from semnet.store import PickleStore
 
 
-mind = SemNet()
+try:
+    mind = PickleStore.load("semnet.pickle")
+except:
+    mind = SemNet()
+
+store = PickleStore(mind, "semnet.pickle")
 
 def show_concept(concept=None):
     if concept is None:
         for c in mind.concepts:
-            print(c)
+            print(c._full_str())
             print()
     else:
-        print(concept)
+        print(concept._full_str())
         print()
         for child in concept.children:
             show_concept(child)
 
 def parse(sentence):
     dep_graph = next(parser.raw_parse(sentence))
-    #nodes = parser.connect_nodes(dep_graph)
-    #handler.assimilate(nodes[0])
-    interp.eval_root(dep_graph.root, dep_graph.nodes, mind)
+    try: interp.eval_root(dep_graph.root, dep_graph.nodes, mind)
+    except: pass
     return dep_graph
 
 def repl():

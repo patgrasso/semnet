@@ -4,15 +4,21 @@ import sys
 import os
 import subprocess
 
-from network import SemNet
-import parser, config, interp
+from semnet.network import SemNet
+from semnet.store import PickleStore
+from semnet import parser, config, interp
 
 if len(sys.argv) <= 1:
     sys.argv += ["tree"]
 
 pages = ' '.join(sys.argv[1:]).split(',')
 
-mind = SemNet()
+try:
+    mind = PickleStore.load("semnet.pickle")
+except:
+    mind = SemNet()
+
+store = PickleStore(mind, "semnet.pickle")
 
 for page in pages:
     wikipedia.set_lang("simple")

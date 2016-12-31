@@ -17,10 +17,10 @@ class Concept(object):
 
             for attr_val in attr_values[:-1]:
                 if attr_val != self:
-                    ret.append("|   " + attr_val.__repr__(indent + 1))
+                    ret.append("|   " + attr_val._full_str(indent + 1))
 
             if len(attr_values) > 0 and attr_values[-1] != self:
-                ret.append("|   " + attr_values[-1].__repr__(indent + 1))
+                ret.append("|   " + attr_values[-1]._full_str(indent + 1))
 
         return ("\n" + "|   "*indent).join(ret)
 
@@ -36,6 +36,12 @@ class Concept(object):
             self._attributes[name] = []
         if value not in self._attributes[name]:
             self._attributes[name].append(value)
+
+            # Notify observers of link
+            self.semnet.emit("set_attribute",
+                             source=self,
+                             attribute=name,
+                             target=value)
         return value
 
     def __hash__(self):
@@ -69,6 +75,8 @@ class Concept(object):
 
         new_concept = Concept(self.name, self.semnet, self, mods)
         self.children.append(new_concept)
+        self.semnet.emit("new_concept", concept=new_concept, parent=self)
+
         return new_concept
 
     def _ref_count(self, ref_counts):

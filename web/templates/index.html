@@ -3,16 +3,23 @@
     <title>SemNet</title>
     <style>
      .link {
-         stroke: #000
-         stroke-width: 1
+         stroke: #000;
+         stroke-width: 1;
      }
-     #status {
+     #hud p {
+         margin: 5px 0;
+     }
+     #status, #status-drawing {
          color: #ff6f00;
          font-weight: 700;
-         margin: 5px 0 0 0;
+         margin: 5px 0;
+         font-size: 10px;
+     }
+     #progress-drawing {
+         width: 100%;
      }
      input[type="text"] {
-         width: 100%
+         width: 100%;
      }
      input[type="submit"] {
          width: 100px;
@@ -27,26 +34,43 @@
          background-color: #2e7d32;
 
      }
-     form {
+     #hud {
          position: fixed;
+         z-index: 4;
+         font-family: sans-serif;
          border: 2px solid black;
          padding: 10px;
-         z-index: 4;
          width: 250px;
+     }
+     #topics {
+         margin: 0;
+         padding: 0;
+     }
+     #topics li {
+         pointer-events: none;
+         list-style: none;
      }
     </style>
   </head>
   <body>
-    <form id="sentence_form" action="/wiki_page" method="POST">
-      <input
-        type="text"
-        name="sentence"
-        placeholder="Enter a topic..."
-        autocomplete="off"
-      />
-      <input type="submit" name="submit" value="Assimilate" />
-      <p id="status" hidden="hidden">Loading (this can take a while...)</p>
-    </form>
+    <div id="hud">
+      <form id="sentence_form" action="/wiki_page" method="POST">
+        <input
+          type="text"
+          name="sentence"
+          placeholder="Enter a topic..."
+          autocomplete="off"
+        />
+        <input type="submit" name="submit" value="Assimilate" />
+        <p id="status" hidden="hidden">Loading (this can take a while...)</p>
+        <p id="status-drawing" hidden="hidden">
+          Rendering (this can take a while...)
+        </p>
+        <progress id="progress-drawing" hidden="hidden" value="0" max="100"></progress>
+      </form>
+      <p>Topics:</p>
+      <ul id="topics"></ul>
+    </div>
     <!--svg id="semnet-graph"></svg-->
     <div id="semnet-graph-canvas"></div>
     <script src="//cdnjs.cloudflare.com/ajax/libs/vis/4.17.0/vis.min.js"></script>
